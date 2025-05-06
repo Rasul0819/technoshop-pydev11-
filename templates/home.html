@@ -1,1 +1,8 @@
-<h1>homepage</h1>
+<form method="get" action="{% url 'product_search' %}">
+    {% csrf_token %}
+    <input type="text" name="query">
+    <button type="submit" >Search</button>
+
+
+</form>
+

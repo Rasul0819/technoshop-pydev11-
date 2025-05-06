@@ -1,8 +1,32 @@
 from django.shortcuts import render, redirect
 from . import forms
+from . import models
 from django.views.generic import TemplateView
 from django.contrib.auth import login,logout,authenticate
-# Create your views here.
+
+from django.db.models import Q
+
+def product_search(request):
+    form = forms.SearchForm()
+    query = None
+    results = []
+    if 'query' in request.GET:
+        form  = forms.SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = models.Product.objects.filter(
+                Q(product_name__icontains=query)|
+                Q(brand__icontains=query)
+            )
+           
+    return render(request,'search_results.html',
+                  {
+                      'form':form,
+                      'query':query,
+                      'results':results
+                  })
+    
+
 
 
 
