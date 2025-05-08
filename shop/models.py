@@ -1,12 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+import random
 
 # Create your models here.
 class CustomUser(AbstractUser):
     phone_num = models.CharField(max_length=12)
     email = models.CharField(max_length=50)
     adres = models.CharField(max_length=300)
+    is_verified = models.BooleanField(default=False)
+    verification_code = models.CharField(max_length=6, blank=True, null=True)
+
+    def generate_verification_code(self):
+        self.verification_code = str(random.randint(100000, 999999))
+        self.save()
 
 class Brand(models.Model):
     brand_name = models.CharField(max_length=250)

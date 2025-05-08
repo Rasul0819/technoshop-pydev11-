@@ -6,6 +6,9 @@ from django.contrib.auth import login,logout,authenticate
 
 from django.db.models import Q
 
+from django.contrib import messages
+from django.core.mail import send_mail
+
 def product_search(request):
     form = forms.SearchForm()
     query = None
@@ -54,19 +57,45 @@ def contactus(request):
     }
     return render(request,'contact.html',context)
 
-
-
 def registration(request):
-    if request.method=='POST':
-
+    if request.method == 'POST':
         form = forms.RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request,user)
-            return redirect('home')
+            user = form.save(commit=False)
+            user.is_active = False 
+            user.save()
+            user.generate_verification_code()
+            
+            
+            send_sms(user.phone_num, f"Your verification code is: {user.verification_code}")
+            
+            return redirect('verify_code', user_id=user.id)
     else:
         form = forms.RegistrationForm()
-    return render(request,'users/regis.html',{'form':form})
+    return render(request, 'users/regis.html', {'form': form})
+
+
+def send_sms(phone, message):
+    print(f"Send to {phone}: {message}")
+
+def verify_code(request, user_id):
+    user = models.CustomUser.objects.get(id=user_id)
+
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        if code == user.verification_code:
+            user.is_active = True
+            user.is_verified = True
+            user.verification_code = ''
+            user.save()
+            messages.success(request, "Account verified!")
+            login(request,user)
+            return redirect('home')
+        else:
+            messages.error(request, "Invalid code")
+
+    return render(request, 'users/verify.html', {'user': user})
+
 
 
 

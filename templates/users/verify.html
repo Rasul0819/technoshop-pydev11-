@@ -1,0 +1,7 @@
+<h2>Verify your account</h2>
+<form method="post">
+    {% csrf_token %}
+    <p>Enter the 6-digit code sent to your phone</p>
+    <input type="text" name="code" maxlength="6" required>
+    <input type="submit" value="Verify">
+</form>
