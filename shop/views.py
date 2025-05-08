@@ -75,8 +75,9 @@ def registration(request):
     return render(request, 'users/regis.html', {'form': form})
 
 
-def send_sms(phone, message):
-    print(f"Send to {phone}: {message}")
+def send_sms(phone, message):#test ushin
+    print(f"Send to {phone}: {message}")#<- minaw tekke terminalga shigaradi.
+    #aniq islewi ushin API menen jalgaw kerek. twilio ya clicksend
 
 def verify_code(request, user_id):
     user = models.CustomUser.objects.get(id=user_id)
