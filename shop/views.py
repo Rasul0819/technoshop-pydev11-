@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from . import forms
 from . import models
 from django.views.generic import TemplateView
@@ -30,7 +30,33 @@ def product_search(request):
                   })
     
 
+def add_to_cart(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('login')  # или временно можно session_cart использовать
 
+    product = get_object_or_404(models.Product, id=product_id)
+    cart_item, created = models.CartItem.objects.get_or_create(
+        user=request.user,
+        product=product,
+    )
+    if not created:
+        cart_item.quantity += 1
+    cart_item.save()
+    return redirect('cart')
+
+
+# views.py
+
+def cart(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    cart_items = models.CartItem.objects.filter(user=request.user)
+    total_price = sum(item.total_price() for item in cart_items)
+    return render(request, 'cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price
+    })
 
 
 # def index(request):

@@ -1,0 +1,8 @@
+<h2>Your Cart</h2>
+{% for item in cart_items %}
+  <p>{{ item.product.product_name }} — {{ item.quantity }} x {{ item.product.price }} = {{ item.total_price }} сум</p>
+{% empty %}
+  <p>Your cart is empty.</p>
+{% endfor %}
+
+<h3>Total: {{ total_price }} сум</h3>
